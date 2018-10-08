@@ -6,10 +6,11 @@ services:
     image: nicolaspernoud/webfront
     build: .
     restart: unless-stopped
-    command: -rules=./rules.json
+    command: -rules=./rules.json -letsencrypt_cache=./letsencrypt_cache
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ./rules.json:/app/rules.json
+      - ~/rules.json:/app/rules.json
+      - ~/letsencrypt_cache:/app/letsencrypt_cache
     ports:
       - 443:443
       - 80:80
