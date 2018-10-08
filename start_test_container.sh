@@ -8,9 +8,3 @@ docker run --name test-nginx \
 -p 8081:80 \
 -d \
 nginx
-
-# Allow reverse proxy to listen on ports 80 and 443
-go build
-
-# Start the reverse proxy
-./webfront -rules=./rules.json

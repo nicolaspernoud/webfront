@@ -1,0 +1,16 @@
+version: "2.4"
+
+services:
+
+  webfront-container:
+    image: nicolaspernoud/webfront
+    build: .
+    restart: unless-stopped
+    command: -rules=./rules.json
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./rules.json:/app/rules.json
+    ports:
+      - 443:443
+      - 80:80
+    network_mode: "host"
