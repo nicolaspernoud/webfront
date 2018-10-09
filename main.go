@@ -251,8 +251,27 @@ func makeHandler(r *Rule) http.Handler {
 	if h := r.Forward; h != "" {
 		return &httputil.ReverseProxy{
 			Director: func(req *http.Request) {
-				req.URL.Scheme = "http"
-				req.URL.Host = h
+				// Set the correct scheme to the request
+				if !strings.HasPrefix(h, "http") {
+					req.URL.Scheme = "http"
+					req.URL.Host = h
+					req.Host = h
+				} else {
+					hSplit := strings.Split(h, "://")
+					req.URL.Scheme = hSplit[0]
+					req.URL.Host = hSplit[1]
+					req.Host = hSplit[1]
+				}
+			},
+			ModifyResponse: func(res *http.Response) error {
+				// Alter the redirect location
+				u, err := res.Location()
+				if err == nil {
+					u.Scheme = "https"
+					u.Host = r.Host + ":" + strconv.Itoa(*port)
+					res.Header.Set("Location", u.String())
+				}
+				return nil
 			},
 		}
 	}
