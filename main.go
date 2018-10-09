@@ -255,12 +255,12 @@ func makeHandler(r *Rule) http.Handler {
 				if !strings.HasPrefix(h, "http") {
 					req.URL.Scheme = "http"
 					req.URL.Host = h
-					req.Host = h
+					//req.Host = h
 				} else {
 					hSplit := strings.Split(h, "://")
 					req.URL.Scheme = hSplit[0]
 					req.URL.Host = hSplit[1]
-					req.Host = hSplit[1]
+					//req.Host = hSplit[1]
 				}
 			},
 			ModifyResponse: func(res *http.Response) error {
