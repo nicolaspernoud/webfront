@@ -218,7 +218,7 @@ func (s *Server) hostPolicy(ctx context.Context, host string) error {
 	defer s.mu.RUnlock()
 
 	for _, rule := range s.rules {
-		if host == rule.Host || host == "www."+rule.Host {
+		if host == rule.Host || strings.HasSuffix(host, rule.Host) {
 			return nil
 		}
 	}
