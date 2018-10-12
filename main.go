@@ -263,7 +263,7 @@ func makeHandler(r *Rule) http.Handler {
 					//req.Host = hSplit[1]
 				}
 			},
-			ModifyResponse: func(res *http.Response) error {
+			/* 			ModifyResponse: func(res *http.Response) error {
 				// Alter the redirect location
 				u, err := res.Location()
 				if err == nil && !strings.HasSuffix(u.Host, r.Host) {
@@ -272,7 +272,7 @@ func makeHandler(r *Rule) http.Handler {
 					res.Header.Set("Location", u.String())
 				}
 				return nil
-			},
+			}, */
 		}
 	}
 	if d := r.Serve; d != "" {
