@@ -263,8 +263,8 @@ func makeHandler(r *Rule) http.Handler {
 					//req.Host = hSplit[1]
 				}
 			},
-			/* 			ModifyResponse: func(res *http.Response) error {
-				// Alter the redirect location
+			ModifyResponse: func(res *http.Response) error {
+				// Alter the redirect location if the redirection is made to private host only
 				u, err := res.Location()
 				if err == nil && !strings.HasSuffix(u.Host, r.Host) {
 					u.Scheme = "https"
@@ -272,7 +272,7 @@ func makeHandler(r *Rule) http.Handler {
 					res.Header.Set("Location", u.String())
 				}
 				return nil
-			}, */
+			},
 		}
 	}
 	if d := r.Serve; d != "" {
