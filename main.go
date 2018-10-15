@@ -264,9 +264,11 @@ func makeHandler(r *Rule) http.Handler {
 			ModifyResponse: func(res *http.Response) error {
 				// Alter the redirect location only if the redirection is made to private host
 				u, err := res.Location()
-				if err == nil && !strings.HasSuffix(u.Host, r.Host) {
+				if err == nil {
 					u.Scheme = "https"
-					u.Host = r.Host + ":" + strconv.Itoa(*port)
+					if !strings.HasSuffix(u.Host, r.Host) {
+						u.Host = r.Host + ":" + strconv.Itoa(*port)
+					}
 					res.Header.Set("Location", u.String())
 				}
 				return nil
