@@ -271,6 +271,7 @@ func makeHandler(r *Rule) http.Handler {
 					}
 					res.Header.Set("Location", u.String())
 				}
+				res.Header.Del("Content-Security-Policy")
 				return nil
 			},
 		}
