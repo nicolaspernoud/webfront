@@ -97,13 +97,13 @@ func main() {
 
 		server := &http.Server{
 			Addr:    ":" + strconv.Itoa(*port),
-			Handler: logMiddleware(proxyServer),
+			Handler: corsMiddleware(logMiddleware(proxyServer)),
 			TLSConfig: &tls.Config{
 				GetCertificate: certManager.GetCertificate,
 			},
 		}
 
-		go http.ListenAndServe(":80", corsMiddleware(certManager.HTTPHandler(nil)))
+		go http.ListenAndServe(":80", certManager.HTTPHandler(nil))
 		server.ListenAndServeTLS("", "")
 	}
 }
