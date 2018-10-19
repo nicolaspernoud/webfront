@@ -87,7 +87,7 @@ func main() {
 
 	// Serve locally with https on debug mode or with let's encrypt on production mode
 	if *letsCacheDir == "" {
-		log.Fatal(http.ListenAndServeTLS(":"+strconv.Itoa(*port), "./dev_certificates/localhost.crt", "./dev_certificates/localhost.key", logMiddleware(corsMiddleware(proxyServer))))
+		log.Fatal(http.ListenAndServeTLS(":"+strconv.Itoa(*port), "./dev_certificates/localhost.crt", "./dev_certificates/localhost.key", logMiddleware(proxyServer)))
 	} else {
 		certManager := autocert.Manager{
 			Prompt:     autocert.AcceptTOS,
@@ -97,7 +97,7 @@ func main() {
 
 		server := &http.Server{
 			Addr:    ":" + strconv.Itoa(*port),
-			Handler: corsMiddleware(logMiddleware(proxyServer)),
+			Handler: logMiddleware(proxyServer),
 			TLSConfig: &tls.Config{
 				GetCertificate: certManager.GetCertificate,
 			},
@@ -271,7 +271,6 @@ func makeHandler(r *Rule) http.Handler {
 					}
 					res.Header.Set("Location", u.String())
 				}
-				res.Header.Del("Content-Security-Policy")
 				return nil
 			},
 		}
@@ -288,17 +287,5 @@ func logMiddleware(next http.Handler) http.Handler {
 			log.Println(r.Method, r.URL.Path, r.RemoteAddr, r.UserAgent())
 		}()
 		next.ServeHTTP(w, r)
-	})
-}
-
-func corsMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, PROPFIND, MKCOL, MOVE, COPY")
-		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, Depth, Destination")
-		if req.Method == "OPTIONS" {
-			return
-		}
-		next.ServeHTTP(w, req)
 	})
 }
