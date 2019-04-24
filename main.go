@@ -250,6 +250,9 @@ func parseRules(file string) ([]*Rule, error) {
 func makeHandler(r *Rule) http.Handler {
 	if h := r.Forward; h != "" {
 		return &httputil.ReverseProxy{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			},
 			Director: func(req *http.Request) {
 				// Set the correct scheme and host to the request
 				if !strings.HasPrefix(h, "http") {
