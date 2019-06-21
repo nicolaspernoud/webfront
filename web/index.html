@@ -18,8 +18,13 @@
 			</header>
 	</nav>
 	<section>
-		<h2>Configuration</h2>
-		<h3>Add/Edit app</h3>
+		<h2>Authentication</h2>
+		<label>Token</label>
+		<input type="password" id="token">
+		<button primary onclick="getApps()">Set</button>
+	</section>
+	<section>
+		<h2>Add/Edit app</h2>
 		<label>Id</label>
 		<input type="number" id="id">
 		<label>Host</label>
@@ -34,6 +39,9 @@
 			<input type="text" id="serve">
 		</div>
 		<button primary onclick="addApp()">Add/Edit</button>
+	</section>
+	<section>
+		<h2>Apps list</h2>
 		<div id="apps-table"></div>
 	</section>
 </body>
@@ -42,25 +50,26 @@
 	getApps();
 
 	function getApps() {
-		fetch('/apps/', {
-			method: 'get',
-		}).then(response => response.json())
-			.then(apps => displayApps(apps))
-			.catch(err => console.log(err));
+		if (document.getElementById('token').value !== "") {
+			fetch('/apps/', {
+				method: 'get',
+				headers: getTokenHeader()
+			}).then(response => response.json())
+				.then(apps => displayApps(apps))
+				.catch(err => console.log(err));
+		}
 	}
 
 	function addApp() {
 		fetch('/apps/', {
 			method: 'post',
+			headers: getTokenHeader(),
 			body: JSON.stringify({
 				id: parseInt(document.getElementById('id').value),
 				host: document.getElementById('host').value,
 				isProxy: document.getElementById('isProxy').checked,
 				forwardTo: document.getElementById('forwardTo').value,
 				serve: document.getElementById('serve').value
-			}),
-			headers: new Headers({
-				'Content-Type': 'application/json'
 			})
 		}).then(response => response.json())
 			.then(apps => displayApps(apps))
@@ -70,7 +79,8 @@
 
 	function deleteApp(id) {
 		fetch('/apps/' + id, {
-			method: 'delete'
+			method: 'delete',
+			headers: getTokenHeader()
 		}).then(response => response.json())
 			.then(apps => displayApps(apps))
 			.catch(err => console.log(err))
@@ -90,6 +100,7 @@
 	function reloadApps() {
 		fetch('/reload', {
 			method: 'get',
+			headers: getTokenHeader()
 		}).catch(err => console.log(err));
 	}
 
@@ -135,6 +146,12 @@
 			document.getElementById('fwdTo').style.display = 'none';
 			document.getElementById('srv').style.display = 'block';
 		}
+	}
+
+	function getTokenHeader() {
+		return new Headers({
+			"Token": document.getElementById('token').value
+		});
 	}
 </script>
 

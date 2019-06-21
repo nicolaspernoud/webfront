@@ -31,7 +31,16 @@ var (
 	httpPort     = flag.Int("http_port", 80, "HTTP port to serve on (defaults to 80), only used to get let's encrypt certificates")
 	debugMode    = flag.Bool("debug", false, "Debug mode, disable let's encrypt, enable CORS and more logging")
 	frameSource  = "localhost"
+	token        string
 )
+
+func init() {
+	var err error
+	token, err = common.GenerateRandomString(48)
+	if err != nil {
+		log.Logger.Fatal(err)
+	}
+}
 
 func main() {
 
@@ -53,6 +62,7 @@ func main() {
 	}
 	log.Logger.Println("--- Server is starting ---")
 	log.Logger.Printf("Main hostname is %v\n", *mainHostName)
+	log.Logger.Printf("Access token is %v\n", token)
 
 	// Create the server
 	rootMux, hostPolicy := createRootMux(*httpsPort, &frameSource, *mainHostName, *appsFile)
@@ -94,8 +104,8 @@ func createRootMux(port int, frameSource *string, mainHostName string, appsFile 
 	// Create the main handler
 	mainMux := http.NewServeMux()
 	// Expose apps API
-	mainMux.HandleFunc("/apps/", types.ProcessApps)
-	mainMux.Handle("/reload", reloadApps(appServer))
+	mainMux.Handle("/apps/", validateTokenMiddleware(http.HandlerFunc(types.ProcessApps)))
+	mainMux.Handle("/reload", validateTokenMiddleware(reloadApps(appServer)))
 	// Serve static files falling back to serving index.html
 	mainMux.Handle("/", http.FileServer(&common.FallBackWrapper{Assets: http.Dir("web")}))
 
@@ -115,5 +125,15 @@ func reloadApps(appServer *appserver.Server) http.Handler {
 			fmt.Fprintf(w, "apps reloaded")
 		}
 
+	})
+}
+
+func validateTokenMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if req.Header.Get("Token") != token {
+			http.Error(w, "wrong token", 401)
+			return
+		}
+		next.ServeHTTP(w, req)
 	})
 }

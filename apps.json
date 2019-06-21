@@ -14,7 +14,7 @@
 		"id": 2,
 		"isProxy": true,
 		"host": "webfront-test-proxy-2.127.0.0.1.nip.io",
-		"forwardTo": "https://mail.ninico.fr",
+		"forwardTo": "www.example.com",
 		"serve": "",
 		"secured": false,
 		"login": "",
