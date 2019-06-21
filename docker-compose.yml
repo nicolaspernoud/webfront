@@ -6,7 +6,7 @@ services:
     image: webfront
     build: .
     restart: unless-stopped
-    command: -debug -apps=./apps.json -letsencrypt_cache=./letsencrypt_cache -hostname=${HOSTNAME}
+    command: -rules=./apps.json -letsencrypt_cache=./letsencrypt_cache -hostname=${HOSTNAME}
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./apps.json:/app/apps.json
