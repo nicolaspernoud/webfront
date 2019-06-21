@@ -21,7 +21,7 @@ RUN           apk update && apk add ca-certificates libcap
 
 COPY          --from=server-builder /webfront/webfront /app
 COPY          --from=server-builder /webfront/dev_certificates /app/dev_certificates
-COPY          --from=server-builder /webfront/rules.json /app/rules.json
+COPY          --from=server-builder /webfront/apps.json /app/apps.json
 
 RUN           setcap cap_net_bind_service=+ep webfront
 

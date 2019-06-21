@@ -1,0 +1,141 @@
+<!doctype HTML>
+<html lang="en">
+
+<head>
+	<title>Webfront+ configuration</title>
+	<meta charset=utf-8>
+	<meta name="description" content="BareCSS template file">
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<link href="css/bare.min.css" rel="stylesheet">
+</head>
+
+<body>
+	<nav>
+		<label>
+			<input type="checkbox">
+			<header>
+				<a href="http://www.barecss.com"><img src="img/logo.svg">Webfront+</a>
+			</header>
+	</nav>
+	<section>
+		<h2>Configuration</h2>
+		<h3>Add/Edit app</h3>
+		<label>Id</label>
+		<input type="number" id="id">
+		<label>Host</label>
+		<input type="text" id="host">
+		<input type="checkbox" id="isProxy" onclick="setVisible()"> <label for="isProxy">App proxies to a server</label>
+		<div id="fwdTo">
+			<label>Forward To</label>
+			<input type="text" id="forwardTo">
+		</div>
+		<div id="srv">
+			<label>Serve</label>
+			<input type="text" id="serve">
+		</div>
+		<button primary onclick="addApp()">Add/Edit</button>
+		<div id="apps-table"></div>
+	</section>
+</body>
+<script type='text/javascript'>
+	setVisible();
+	getApps();
+
+	function getApps() {
+		fetch('/apps/', {
+			method: 'get',
+		}).then(response => response.json())
+			.then(apps => displayApps(apps))
+			.catch(err => console.log(err));
+	}
+
+	function addApp() {
+		fetch('/apps/', {
+			method: 'post',
+			body: JSON.stringify({
+				id: parseInt(document.getElementById('id').value),
+				host: document.getElementById('host').value,
+				isProxy: document.getElementById('isProxy').checked,
+				forwardTo: document.getElementById('forwardTo').value,
+				serve: document.getElementById('serve').value
+			}),
+			headers: new Headers({
+				'Content-Type': 'application/json'
+			})
+		}).then(response => response.json())
+			.then(apps => displayApps(apps))
+			.catch(err => console.log(err))
+			.then(apps => reloadApps(apps));
+	}
+
+	function deleteApp(id) {
+		fetch('/apps/' + id, {
+			method: 'delete'
+		}).then(response => response.json())
+			.then(apps => displayApps(apps))
+			.catch(err => console.log(err))
+			.then(apps => reloadApps(apps));
+	}
+
+	function editApp(encodedApp) {
+		const app = JSON.parse(decodeURIComponent(encodedApp));
+		document.getElementById('id').value = app.id;
+		document.getElementById('host').value = app.host;
+		document.getElementById('isProxy').checked = app.isProxy;
+		document.getElementById('forwardTo').value = app.forwardTo;
+		document.getElementById('serve').value = app.serve;
+		setVisible();
+	}
+
+	function reloadApps() {
+		fetch('/reload', {
+			method: 'get',
+		}).catch(err => console.log(err));
+	}
+
+	function displayApps(apps) {
+		const markup = `
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Host</th>
+                                    <th>Proxy</th>
+                                    <th>Forward To</th>
+									<th>Serve</th>
+									<th></th>
+									<th>Actions</th>
+									<th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${apps.map(app => `
+                                <tr>
+                                    <td>${app.id}</td>
+                                    <td>${app.host}</td>
+                                    <td>${app.isProxy}</td>
+                                    <td>${app.forwardTo}</td>
+									<td>${app.serve}</td>
+									<td><button onclick="window.location.href = 'https://${app.host}:${location.port}'">Visit</button></td>
+									<td><button onclick="editApp('${encodeURIComponent(JSON.stringify(app))}')">Edit</button></td>
+									<td><button onclick="deleteApp(${app.id})">Delete</button></td>
+                                </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                        `
+		document.getElementById('apps-table').innerHTML = markup;
+	}
+
+	function setVisible() {
+		if (document.getElementById('isProxy').checked) {
+			document.getElementById('fwdTo').style.display = 'block';
+			document.getElementById('srv').style.display = 'none';
+		} else {
+			document.getElementById('fwdTo').style.display = 'none';
+			document.getElementById('srv').style.display = 'block';
+		}
+	}
+</script>
+
+</html>

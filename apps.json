@@ -1,0 +1,35 @@
+[
+	{
+		"id": 1,
+		"isProxy": true,
+		"host": "webfront-test-proxy.127.0.0.1.nip.io",
+		"forwardTo": "localhost:8081",
+		"serve": "",
+		"secured": false,
+		"login": "",
+		"password": "",
+		"roles": null
+	},
+	{
+		"id": 2,
+		"isProxy": true,
+		"host": "webfront-test-proxy-2.127.0.0.1.nip.io",
+		"forwardTo": "www.example.com",
+		"serve": "",
+		"secured": false,
+		"login": "",
+		"password": "",
+		"roles": null
+	},
+	{
+		"id": 3,
+		"isProxy": false,
+		"host": "webfront-test-static.127.0.0.1.nip.io",
+		"forwardTo": "",
+		"serve": "./testdata",
+		"secured": false,
+		"login": "",
+		"password": "",
+		"roles": null
+	}
+]

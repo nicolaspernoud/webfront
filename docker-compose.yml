@@ -6,11 +6,13 @@ services:
     image: webfront
     build: .
     restart: unless-stopped
-    command: -rules=./rules.json -letsencrypt_cache=./letsencrypt_cache
+    command: -rules=./apps.json -letsencrypt_cache=./letsencrypt_cache -hostname=${HOSTNAME}
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ./rules.json:/app/rules.json
+      - ./apps.json:/app/apps.json
       - ./letsencrypt_cache:/app/letsencrypt_cache
     ports:
       - 443:443
       - 80:80
+    environment:
+     - HOSTNAME=wf.alpha.grandlyon.com

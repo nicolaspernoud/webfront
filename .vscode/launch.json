@@ -14,7 +14,7 @@
             "host": "127.0.0.1",
             "program": "${workspaceFolder}/main.go",
             "env": {},
-            "args": [ "-rules=./rules.json", "-http=:8080", "-https_port=1443"],
+            "args": ["-debug", "-apps=./apps.json", "-https_port=1443", "-hostname=webfront.127.0.0.1.nip.io"],
             "showLog": true
         },
     ]
