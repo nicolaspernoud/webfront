@@ -16,7 +16,6 @@ import (
 
 	"github.com/nicolaspernoud/ninicobox-v3-server/pkg/common"
 	"github.com/nicolaspernoud/ninicobox-v3-server/pkg/log"
-	"github.com/nicolaspernoud/ninicobox-v3-server/pkg/security"
 	"github.com/nicolaspernoud/webfront/internal/types"
 
 	"golang.org/x/crypto/acme/autocert"
@@ -69,7 +68,7 @@ func main() {
 
 	// Serve locally with https on debug mode or with let's encrypt on production mode
 	if *debugMode {
-		log.Logger.Fatal(http.ListenAndServeTLS(":"+strconv.Itoa(*httpsPort), "./dev_certificates/localhost.crt", "./dev_certificates/localhost.key", security.CorsMiddleware(log.Middleware(rootMux), &frameSource)))
+		log.Logger.Fatal(http.ListenAndServeTLS(":"+strconv.Itoa(*httpsPort), "./dev_certificates/localhost.crt", "./dev_certificates/localhost.key", log.Middleware(rootMux)))
 	} else {
 		certManager := autocert.Manager{
 			Prompt:     autocert.AcceptTOS,
@@ -94,8 +93,14 @@ func main() {
 }
 
 func createRootMux(port int, frameSource *string, mainHostName string, appsFile string) (http.Handler, func(ctx context.Context, host string) error) {
+	// Create the authorization function (dummy for now)
+	authz := func(next http.Handler, allowedRoles []string) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			next.ServeHTTP(w, req)
+		})
+	}
 	// Create the app handler
-	appServer, err := appserver.NewServer(appsFile, port, *frameSource, mainHostName)
+	appServer, err := appserver.NewServer(appsFile, port, *frameSource, mainHostName, authz)
 	if err != nil {
 		log.Logger.Fatal(err)
 	}
