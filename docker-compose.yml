@@ -9,7 +9,7 @@ services:
     command: -apps=./apps.json -letsencrypt_cache=./letsencrypt_cache -hostname=${HOSTNAME}
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ./apps.json:/app/apps.json
+      - /home/npernoud/apps.json:/app/apps.json
       - ./letsencrypt_cache:/app/letsencrypt_cache
     ports:
       - 443:443
