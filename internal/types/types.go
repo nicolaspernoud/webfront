@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"strings"
 
+	"sort"
+
 	"github.com/nicolaspernoud/ninicobox-v3-server/pkg/appserver"
 	"github.com/nicolaspernoud/ninicobox-v3-server/pkg/common"
 )
@@ -15,6 +17,13 @@ type App struct {
 	ID int `json:"id"`
 	appserver.App
 }
+
+// ByID implements sort.Interface for []App based on the Id field
+type ByID []App
+
+func (a ByID) Len() int           { return len(a) }
+func (a ByID) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByID) Less(i, j int) bool { return a[i].ID < a[j].ID }
 
 // ProcessApps processes apps regarding of HTTP method
 func ProcessApps(w http.ResponseWriter, req *http.Request) {
@@ -70,6 +79,7 @@ func AddApp(w http.ResponseWriter, req *http.Request) {
 	}
 	if isNew {
 		apps = append(apps, newApp)
+		sort.Sort(ByID(apps))
 	}
 	err = common.Save("./apps.json", &apps)
 	if err != nil {
