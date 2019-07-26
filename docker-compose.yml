@@ -10,7 +10,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /home/npernoud/apps.json:/app/apps.json
-      - ./letsencrypt_cache:/app/letsencrypt_cache
+      - /home/npernoud/letsencrypt_cache:/app/letsencrypt_cache
     ports:
       - 443:443
       - 80:80
