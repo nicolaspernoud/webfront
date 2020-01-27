@@ -1,3 +1,5 @@
+# Replaced by vestibule (https://www.github.com/nicolaspernoud/Vestibule)
+
 # Webfront+
 
 Webfront+ is an HTTP server and reverse proxy.
